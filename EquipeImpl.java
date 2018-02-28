@@ -3,15 +3,14 @@ package ca.uqam.inf2120.tp1.adt.impl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import ca.uqam.inf2120.tp1.adt.*;
-import ca.uqam.inf2120.tp1.adt.test.*;
 
 public class EquipeImpl<T> implements EquipeTda<T> {
 	
-	ArrayList<T> equipeList = new ArrayList<>();
+	private ArrayList<T> equipeList = new ArrayList<>();
 	
 	public ArrayList<T> getEquipeList() {
 		return equipeList;
@@ -20,6 +19,8 @@ public class EquipeImpl<T> implements EquipeTda<T> {
 	public void setEquipeList(ArrayList<T> equipeList) {
 		this.equipeList = equipeList;
 	}	
+	
+	
 	
 	/**
      * Ajoute un membre dans l'équipe courante à la première position vide.
@@ -58,6 +59,9 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      *         qu'il est ajouté, sinon false
      */
      public boolean ajouter(int position, T element) throws PositionException {
+    	 if (position < 0 || position > equipeList.size() - 1) {
+    		 throw new PositionException("L'indice de position n'est pas dans le bon intervalle. Veuyez enter un chiffre entre 0 et " + equipeList.size() + ".");
+    	 }
     	boolean rep;
     	
     	if(position >= 0 && position <= equipeList.size() && element != null && !equipeList.contains(element)) {
@@ -83,15 +87,17 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      * ou vide 
      */
      public List<T> ajouter(EquipeTda<T> equipe) {
-    	ArrayList<T> membreRef = new ArrayList<>();
+    	List<T> membreRef = new ArrayList<>();
     	
-    	while(equipe.iterateur().hasNext()) {
-    		if(!equipeList.contains(equipe.iterateur().next())) {
-    			equipeList.add(equipe.iterateur().next());
-    		}
-    		else {
-    			membreRef.add(equipe.iterateur().next());
-    		}
+    	if (!equipe.estVide() && equipe != null) {
+	    	while(equipe.iterateur().hasNext()) {
+	    		if(!equipeList.contains(equipe.iterateur().next())) {
+	    			equipeList.add(equipe.iterateur().next());
+	    		}
+	    		else {
+	    			membreRef.add(equipe.iterateur().next());
+	    		}
+	    	}
     	}
     	return membreRef;
      }
@@ -108,16 +114,17 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      *         sinon un tableau liste (ArrayList<T>) des membres qui n'existent pas dans l'équipe courante
      *         est retourné
      */
-     public List<T> comparer(EquipeTda<T> equipe) {
-    	 ArrayList<T> membreAbs = new ArrayList<>();
-    	 ArrayList<T> equipe1 = (ArrayList<T>)equipe;
-    	 if (equipeList.containsAll(equipe1)) {
-    		 membreAbs = null;
-    	 } else {
-    		 
+     @SuppressWarnings("null")
+	public List<T> comparer(EquipeTda<T> equipe) {
+    	 List<T> membreAbs = new ArrayList<>();
+    	 membreAbs = null;
+    	 while(equipe.iterateur().hasNext()) {
+    		 if(!equipeList.contains(equipe.iterateur().next())) {
+    			 membreAbs.add(equipe.iterateur().next());
+    		 }
     	 }
-    		 
-    	return membreAbs;
+    	 	 
+    	 return membreAbs;
      }    
     
      /**
@@ -167,8 +174,16 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      * pas été retirés, null si tous les membres ont été retirés ou si l'équipe passée en paramètre
      * est nulle ou vide
      */
-     public List<T> retirer(EquipeTda<T> equipe) {
-    	 
+     @SuppressWarnings("null")
+	public List<T> retirer(EquipeTda<T> equipe) {
+    	 ArrayList<T> membreAbs = new ArrayList<>();
+    	 membreAbs = null;
+    	 while(equipe.iterateur().hasNext()) {
+    		 if(!equipeList.contains(equipe.iterateur().next())) {
+    			 membreAbs.remove(equipe.iterateur().next());
+    		 }
+    	 }
+    	 return membreAbs;
      }
     
     /**
@@ -181,7 +196,14 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      * @return vrai si le remplacement a été fait, sinon faux
      */
      public boolean remplacer(T membreARemplacer, T nouveauMembre) {
+    	 boolean rep = false;
     	 
+    	 if (equipeList.contains(membreARemplacer) && !equipeList.contains(nouveauMembre) && nouveauMembre != null) {
+    		 int position = equipeList.indexOf(membreARemplacer);
+    		 equipeList.set(position, membreARemplacer);
+    		 rep = true;
+    	 }
+    	 return rep;
      }
     
      /**
@@ -191,8 +213,16 @@ public class EquipeImpl<T> implements EquipeTda<T> {
      * @return Le HashMap de tous les membres de l'équipe courante et leurs positions,
      * 		null, si l'équipe courante est vide.
      */
-     public Map<Integer, T> membres() {
-    	  Map<Integer, T> equipeMap = new HashMap<>();
+     @SuppressWarnings("null")
+	public Map<Integer, T> membres() {
+    	  HashMap<Integer, T> equipeMap = new HashMap<>();
+    	  equipeMap = null;
+    	  if (!equipeList.isEmpty() && equipeList != null) {
+    		  for (T i : equipeList) {
+    			  equipeMap.put(equipeList.indexOf(i), i);
+    		  }
+    	  }
+    	  return equipeMap;
       }
     
 	 /**
